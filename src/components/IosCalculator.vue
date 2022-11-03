@@ -24,7 +24,9 @@
       <table class="table">
         <tr>
           <td>
-            <div class="num-btn gray-btn" @click="clear">AC</div>
+            <div class="num-btn gray-btn" @click="clear">
+              {{ (acSwitching) ? 'AC':'C' }}
+            </div>
           </td>
           <td>
             <div class="num-btn gray-btn" @click="sign">+/-</div>
@@ -127,10 +129,13 @@ const calResults = ref("");
 
 const operatorWay = ref("");
 
+const acSwitching = ref(true);
+
 // 限制最大數值
 function maxNumber(num) {
   var reg1 = /(^[0-9]{1,2}$)|(^[0-9]{1,2}[\.]{1}[0-9]{1,2}$)/;
   if (num > 999999999) {
+    num = num;
     return reg1.test(num);
   }
   return num.toLocaleString();
@@ -158,10 +163,12 @@ function clear() {
   previousValue.value = null;
   operatorWay.value = "";
   canNotString.value = false;
+  acSwitching.value = true;
 }
 
 // 正負切換
 function sign() {
+  acSwitching.value = false;
   if (calResults.value === "") {
     return (calResults.value = "-0");
   }
@@ -173,6 +180,7 @@ function sign() {
 
 // 百分比
 function percent() {
+  acSwitching.value = false;
   if (calResults.value === "" || calResults.value === "0") {
     return;
   }
@@ -181,10 +189,11 @@ function percent() {
 
 // 一般數字鍵
 function getNumber(number) {
+  acSwitching.value = false;
   if (operatorClick.value && !canNotString.value) {
     calResults.value = "";
     operatorClick.value = false;
-    operatorWay.value = ''
+    operatorWay.value = "";
   }
 
   if (canNotString.value) {
@@ -199,6 +208,7 @@ function getNumber(number) {
 
 // 增加小數點
 function getDot() {
+  acSwitching.value = false;
   if (calResults.value === "" || calResults.value === "0") {
     calResults.value = "0.";
   }
@@ -216,6 +226,7 @@ function setPrevious() {
 
 // 除法 divide
 function divide() {
+  acSwitching.value = false;
   operatorWay.value = "除法";
   if (calResults.value === "" || calResults.value === "0") {
     return;
@@ -225,6 +236,7 @@ function divide() {
 }
 // 乘法 times
 function times() {
+  acSwitching.value = false;
   operatorWay.value = "乘法";
   if (calResults.value === "" || calResults.value === "0") {
     return;
@@ -234,6 +246,7 @@ function times() {
 }
 // 減法 minus
 function minus() {
+  acSwitching.value = false;
   operatorWay.value = "減法";
   if (calResults.value === "" || calResults.value === "0") {
     return;
@@ -243,6 +256,7 @@ function minus() {
 }
 // 加法 add
 function add() {
+  acSwitching.value = false;
   operatorWay.value = "加法";
   if (calResults.value === "" || calResults.value === "0") {
     return;
@@ -253,8 +267,13 @@ function add() {
 
 // 計算結果
 function equal() {
-  if (calResults.value === '' || calResults.value === '0' || calResults.value === '-0' || previousValue === null) {
-    return
+  if (
+    calResults.value === "" ||
+    calResults.value === "0" ||
+    calResults.value === "-0" ||
+    previousValue === null
+  ) {
+    return;
   }
   if (operator.value !== null && !canNotString.value && previousValue.value) {
     calResults.value = `${operator.value(
@@ -265,7 +284,7 @@ function equal() {
     )}`;
 
     canNotString.value = true;
-  }else{
+  } else {
     calResults.value = `${operator.value(
       // a
       parseFloat(preNumber.value),
