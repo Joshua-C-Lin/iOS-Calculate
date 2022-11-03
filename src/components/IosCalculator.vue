@@ -5,10 +5,9 @@
       <!-- 計算結果 -->
       <div class="num-display-area">
         <div v-if="parseFloat(calResults) < 1 && parseFloat(calResults) !== 0">
-          {{ Number(parseFloat(calResults || "0").toPrecision(12)) }}
+          {{ Number(parseFloat(calResults || "0").toPrecision(4)) }}
         </div>
         <div v-if="parseFloat(calResults) > 1">
-          <!-- .toLocaleString() -->
           {{ maxNumber(parseFloat(calResults || "0")) }}
         </div>
         <div
@@ -119,22 +118,22 @@ const numRowFour = ref(["4", "5", "6"]);
 const numRowOne = ref(["1", "2", "3"]);
 
 function testOne() {
-  console.log(calResults.value);
-  console.log(previousValue.value);
+  console.log("b", previousValue.value);
+  console.log("a", calResults.value);
 }
 
 // 計算結果
 const calResults = ref("");
 
-const operatorWay = ref('')
+const operatorWay = ref("");
 
 // 限制最大數值
 function maxNumber(num) {
-  var reg1 = /(^[0-9]{1,2}$)|(^[0-9]{1,2}[\.]{1}[0-9]{1,2}$)/
-  if(num > 999999999) {
-    return (reg1.test(num))
+  var reg1 = /(^[0-9]{1,2}$)|(^[0-9]{1,2}[\.]{1}[0-9]{1,2}$)/;
+  if (num > 999999999) {
+    return reg1.test(num);
   }
-  return num.toLocaleString()
+  return num.toLocaleString();
 }
 
 // 計算開始前紀錄目前數值
@@ -142,7 +141,9 @@ const previousValue = ref(null);
 
 // 連續點擊的時候
 const preNumber = ref("");
-const continuousCal = ref(false);
+
+// false可以連續輸入 true不行
+const canNotString = ref(false);
 
 // 判斷是否要進行計算
 const operatorClick = ref(false);
@@ -155,6 +156,8 @@ function clear() {
   calResults.value = "";
   preNumber.value = "";
   previousValue.value = null;
+  operatorWay.value = "";
+  canNotString.value = false;
 }
 
 // 正負切換
@@ -178,18 +181,20 @@ function percent() {
 
 // 一般數字鍵
 function getNumber(number) {
-  if (operatorClick.value && !continuousCal.value) {
+  if (operatorClick.value && !canNotString.value) {
+    calResults.value = "";
+    operatorClick.value = false;
+    operatorWay.value = ''
+  }
+
+  if (canNotString.value) {
     calResults.value = "";
     operatorClick.value = false;
   }
 
-  // if (continuousCal) {
-  //   calResults.value = ""
-  // }
-  
   calResults.value = `${calResults.value}${number}`;
-  preNumber.value = calResults.value
-  continuousCal.value = false
+  preNumber.value = calResults.value;
+  canNotString.value = false;
 }
 
 // 增加小數點
@@ -206,12 +211,12 @@ function getDot() {
 function setPrevious() {
   previousValue.value = calResults.value;
   operatorClick.value = true;
-  continuousCal.value = false;
+  canNotString.value = false;
 }
 
 // 除法 divide
 function divide() {
-  operatorWay.value = '除法'
+  operatorWay.value = "除法";
   if (calResults.value === "" || calResults.value === "0") {
     return;
   }
@@ -220,16 +225,16 @@ function divide() {
 }
 // 乘法 times
 function times() {
-  operatorWay.value = '乘法'
+  operatorWay.value = "乘法";
   if (calResults.value === "" || calResults.value === "0") {
     return;
   }
-  operator.value = (a, b) => a * b;
+  operator.value = (a, b) => b * a;
   setPrevious();
 }
 // 減法 minus
 function minus() {
-  operatorWay.value = '減法'
+  operatorWay.value = "減法";
   if (calResults.value === "" || calResults.value === "0") {
     return;
   }
@@ -238,36 +243,38 @@ function minus() {
 }
 // 加法 add
 function add() {
-  operatorWay.value = '加法'
+  operatorWay.value = "加法";
   if (calResults.value === "" || calResults.value === "0") {
     return;
   }
-  operator.value = (a, b) => a + b;
+  operator.value = (a, b) => b + a;
   setPrevious();
 }
 
 // 計算結果
 function equal() {
-  if (operator.value !== null && !continuousCal.value) {
+  if (calResults.value === '' || calResults.value === '0' || calResults.value === '-0' || previousValue === null) {
+    return
+  }
+  if (operator.value !== null && !canNotString.value && previousValue.value) {
     calResults.value = `${operator.value(
       // a
       parseFloat(calResults.value),
       // b
       parseFloat(previousValue.value)
     )}`;
-    
-    previousValue.value = calResults.value;
-    continuousCal.value = true;
-  }
 
-  // if(continuousCal.value) {
-  //   calResults.value = `${operator.value(
-  //     // a
-  //     parseFloat(calResults.value),
-  //     // b
-  //     parseFloat(preNumber.value)
-  //   )}`;
-  // }
+    canNotString.value = true;
+  }else{
+    calResults.value = `${operator.value(
+      // a
+      parseFloat(preNumber.value),
+      // b
+      parseFloat(calResults.value)
+    )}`;
+
+    canNotString.value = true;
+  }
 }
 </script>
 
