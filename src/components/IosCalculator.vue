@@ -171,7 +171,6 @@ function clear() {
 
 // 正負切換
 function sign() {
-  acSwitching.value = false;
   if (calResults.value === "") {
     return (calResults.value = "-0");
   }
@@ -183,7 +182,6 @@ function sign() {
 
 // 百分比
 function percent() {
-  acSwitching.value = false;
   if (calResults.value === "" || calResults.value === "0") {
     return;
   }
@@ -229,7 +227,6 @@ function setPrevious() {
 
 // 除法 divide
 function divide() {
-  acSwitching.value = false;
   operatorWay.value = "除法";
   if (calResults.value === "" || calResults.value === "0") {
     return;
@@ -239,7 +236,6 @@ function divide() {
 }
 // 乘法 times
 function times() {
-  acSwitching.value = false;
   operatorWay.value = "乘法";
   if (calResults.value === "" || calResults.value === "0") {
     return;
@@ -249,7 +245,6 @@ function times() {
 }
 // 減法 minus
 function minus() {
-  acSwitching.value = false;
   operatorWay.value = "減法";
   if (calResults.value === "" || calResults.value === "0") {
     return;
@@ -259,7 +254,6 @@ function minus() {
 }
 // 加法 add
 function add() {
-  acSwitching.value = false;
   operatorWay.value = "加法";
   if (calResults.value === "" || calResults.value === "0") {
     return;
@@ -270,10 +264,10 @@ function add() {
 
 // 計算結果
 function equal() {
-  if (calResults.value === "" || calResults.value === "0" || calResults.value === "-0" || previousValue === null) {
+  if (calResults.value === "" || calResults.value === "0" || previousValue === null) {
     return;
   }
-  if (calResults.value === "0.") {
+  if (calResults.value === "0." || calResults.value === "-0") {
     calResults.value = "";
     return;
   }
