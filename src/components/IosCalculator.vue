@@ -2,6 +2,8 @@
   <div>
     <h1 @click="testOne">{{ title }}</h1>
     <div class="calculator">
+      <!-- 靈動島 -->
+      <div class="dynamic-island"></div>
       <!-- 計算結果 -->
       <div class="num-display-area">
         <div v-if="parseFloat(calResults) < 1 && parseFloat(calResults) !== 0">
@@ -25,7 +27,7 @@
         <tr>
           <td>
             <div class="num-btn gray-btn" @click="clear">
-              {{ (acSwitching) ? 'AC':'C' }}
+              {{ acSwitching ? "AC" : "C" }}
             </div>
           </td>
           <td>
@@ -105,6 +107,8 @@
           </td>
         </tr>
       </table>
+      <!-- 返回 -->
+      <div class="home-bar"></div>
     </div>
   </div>
 </template>
@@ -133,10 +137,9 @@ const acSwitching = ref(true);
 
 // 限制最大數值
 function maxNumber(num) {
-  var reg1 = /(^[0-9]{1,2}$)|(^[0-9]{1,2}[\.]{1}[0-9]{1,2}$)/;
   if (num > 999999999) {
-    num = num;
-    return reg1.test(num);
+    num = num.toExponential(2);
+    return num;
   }
   return num.toLocaleString();
 }
@@ -267,12 +270,11 @@ function add() {
 
 // 計算結果
 function equal() {
-  if (
-    calResults.value === "" ||
-    calResults.value === "0" ||
-    calResults.value === "-0" ||
-    previousValue === null
-  ) {
+  if (calResults.value === "" || calResults.value === "0" || calResults.value === "-0" || previousValue === null) {
+    return;
+  }
+  if (calResults.value === "0.") {
+    calResults.value = "";
     return;
   }
   if (operator.value !== null && !canNotString.value && previousValue.value) {
@@ -303,10 +305,26 @@ h1
   user-select: none
 .calculator
   border: 1px solid gray
+  border-radius: 27px
   width: 100%
   max-width: 390px
-  padding: 20px 0
+  padding: 70px 0 20px
   background-color: black
+  position: relative
+  .dynamic-island
+    width: 30%
+    height: 23px
+    border: 1px solid gray
+    border-radius: 30px
+    position: absolute
+    top: 20px
+    left: 50%
+    transform: translate(-50%, -50%)
+    opacity: 0.5
+    transition: opacity 0.2s linear
+
+  .dynamic-island:hover
+    opacity: 1
   .num-display-area
     color: white
     font-size: 3rem
@@ -332,6 +350,7 @@ h1
           cursor: pointer
           padding: 0
           user-select: none
+          font-weight: 600
         .num-btn:active
           background-color: #6b6b6b
         .gray-btn
@@ -362,4 +381,15 @@ h1
         .equal-sign:active
           background-color: #fbc88e
           color: white
+  .home-bar
+    height: 4px
+    width: 132px
+    border: 1px solid white
+    background-color: white
+    border-radius: 100px
+    position: absolute
+    bottom: 6px
+    left: 50%
+    transform: translate(-50%, -50%)
+    opacity: 0.7
 </style>
