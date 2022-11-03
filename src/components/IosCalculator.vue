@@ -4,11 +4,21 @@
     <div class="calculator">
       <!-- 計算結果 -->
       <div class="num-display-area">
-        <div v-if="calResults < 1">
-          {{ calResults || "0" }}
+        <div v-if="parseFloat(calResults) < 1 && parseFloat(calResults) !== 0">
+          {{ Number(parseFloat(calResults || "0").toPrecision(12)) }}
         </div>
-        <div v-else>
-          {{ parseFloat(calResults || "0" ).toLocaleString() }}
+        <div v-if="parseFloat(calResults) > 1">
+          <!-- .toLocaleString() -->
+          {{ maxNumber(parseFloat(calResults || "0")) }}
+        </div>
+        <div
+          v-if="
+            parseFloat(calResults) === 0 ||
+            calResults === '' ||
+            parseFloat(calResults) === 1
+          "
+        >
+          {{ calResults || "0" }}
         </div>
       </div>
 
@@ -116,6 +126,17 @@ function testOne() {
 // 計算結果
 const calResults = ref("");
 
+const operatorWay = ref('')
+
+// 限制最大數值
+function maxNumber(num) {
+  var reg1 = /(^[0-9]{1,2}$)|(^[0-9]{1,2}[\.]{1}[0-9]{1,2}$)/
+  if(num > 999999999) {
+    return (reg1.test(num))
+  }
+  return num.toLocaleString()
+}
+
 // 計算開始前紀錄目前數值
 const previousValue = ref(null);
 
@@ -138,6 +159,9 @@ function clear() {
 
 // 正負切換
 function sign() {
+  if (calResults.value === "") {
+    return (calResults.value = "-0");
+  }
   calResults.value =
     calResults.value[0] === "-"
       ? calResults.value.slice(1)
@@ -146,6 +170,9 @@ function sign() {
 
 // 百分比
 function percent() {
+  if (calResults.value === "" || calResults.value === "0") {
+    return;
+  }
   calResults.value = `${parseFloat(calResults.value) / 100}`;
 }
 
@@ -155,11 +182,21 @@ function getNumber(number) {
     calResults.value = "";
     operatorClick.value = false;
   }
+
+  // if (continuousCal) {
+  //   calResults.value = ""
+  // }
+  
   calResults.value = `${calResults.value}${number}`;
+  preNumber.value = calResults.value
+  continuousCal.value = false
 }
 
 // 增加小數點
 function getDot() {
+  if (calResults.value === "" || calResults.value === "0") {
+    calResults.value = "0.";
+  }
   if (calResults.value.indexOf(".") === -1) {
     calResults.value = calResults.value + ".";
   }
@@ -174,21 +211,37 @@ function setPrevious() {
 
 // 除法 divide
 function divide() {
+  operatorWay.value = '除法'
+  if (calResults.value === "" || calResults.value === "0") {
+    return;
+  }
   operator.value = (a, b) => b / a;
   setPrevious();
 }
 // 乘法 times
 function times() {
+  operatorWay.value = '乘法'
+  if (calResults.value === "" || calResults.value === "0") {
+    return;
+  }
   operator.value = (a, b) => a * b;
   setPrevious();
 }
 // 減法 minus
 function minus() {
-  operator.value = (a, b) => (b - a);
+  operatorWay.value = '減法'
+  if (calResults.value === "" || calResults.value === "0") {
+    return;
+  }
+  operator.value = (a, b) => b - a;
   setPrevious();
 }
 // 加法 add
 function add() {
+  operatorWay.value = '加法'
+  if (calResults.value === "" || calResults.value === "0") {
+    return;
+  }
   operator.value = (a, b) => a + b;
   setPrevious();
 }
@@ -197,13 +250,24 @@ function add() {
 function equal() {
   if (operator.value !== null && !continuousCal.value) {
     calResults.value = `${operator.value(
+      // a
       parseFloat(calResults.value),
+      // b
       parseFloat(previousValue.value)
     )}`;
-  
+    
     previousValue.value = calResults.value;
     continuousCal.value = true;
   }
+
+  // if(continuousCal.value) {
+  //   calResults.value = `${operator.value(
+  //     // a
+  //     parseFloat(calResults.value),
+  //     // b
+  //     parseFloat(preNumber.value)
+  //   )}`;
+  // }
 }
 </script>
 
