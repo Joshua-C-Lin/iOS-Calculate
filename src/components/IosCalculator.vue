@@ -386,4 +386,7 @@ h1
     left: 50%
     transform: translate(-50%, -50%)
     opacity: 0.7
+    transition: opacity 0.2s linear
+  .home-bar:hover
+    opacity: 1
 </style>
