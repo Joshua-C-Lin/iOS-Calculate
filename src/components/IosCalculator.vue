@@ -6,17 +6,16 @@
       <div class="dynamic-island"></div>
       <!-- 計算結果 -->
       <div class="num-display-area">
-        <div v-if="parseFloat(calResults) < 1 && parseFloat(calResults) !== 0">
-          {{ Number(parseFloat(calResults || "0").toPrecision(4)) }}
+        <div style="white-space: nowrap;" v-if="(parseFloat(calResults)%1 !== 0)  && parseFloat(calResults) !== 0 && calResults !== ''">
+          {{ Number(parseFloat(calResults || "0").toPrecision(8)) }}
         </div>
-        <div v-if="parseFloat(calResults) > 1">
+        <div v-if="(parseFloat(calResults)%1 === 0) && parseFloat(calResults) >= 1">
           {{ maxNumber(parseFloat(calResults || "0")) }}
         </div>
         <div
           v-if="
             parseFloat(calResults) === 0 ||
-            calResults === '' ||
-            parseFloat(calResults) === 1
+            calResults === ''
           "
         >
           {{ calResults || "0" }}
@@ -138,7 +137,7 @@ const acSwitching = ref(true);
 // 限制最大數值
 function maxNumber(num) {
   if (num > 999999999) {
-    num = num.toExponential(2);
+    num = num.toExponential(5);
     return num;
   }
   return num.toLocaleString();
@@ -300,7 +299,8 @@ h1
 .calculator
   border: 1px solid gray
   border-radius: 27px
-  width: 100%
+  // width: 100%
+  width: 366px
   max-width: 390px
   padding: 70px 0 20px
   background-color: black
@@ -321,7 +321,7 @@ h1
     opacity: 1
   .num-display-area
     color: white
-    font-size: 3rem
+    font-size: 2.8rem
     text-align: right
     padding-right: 20px
   .table
